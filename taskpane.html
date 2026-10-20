@@ -15,7 +15,6 @@
       --hover: #f0f0f0;
       --accent: #0f6cbd;
       --accent-text: #ffffff;
-      --selected: #ebf3fc;
       --ok: #107c10;
       --warn: #8a5300;
       --error: #c50f1f;
@@ -29,7 +28,6 @@
         --hover: #2e2e2e;
         --accent: #479ef5;
         --accent-text: #0b0b0b;
-        --selected: #0e3a5e;
         --ok: #54b054;
         --warn: #f2c661;
         --error: #f1707b;
@@ -44,6 +42,14 @@
       color: var(--text);
       background: var(--bg);
     }
+    h2 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
     label { display: block; font-weight: 600; margin: 0 0 4px; }
     input[type="text"], input[type="search"] {
       width: 100%;
@@ -55,35 +61,41 @@
       border-radius: 4px;
     }
     input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
-    #results {
+    ul.jobs {
       list-style: none;
-      margin: 8px 0 0;
+      margin: 0;
       padding: 0;
-      max-height: 45vh;
-      overflow-y: auto;
       border: 1px solid var(--border);
       border-radius: 4px;
     }
-    #results:empty { display: none; }
-    #results li {
-      padding: 7px 9px;
-      cursor: pointer;
-      border-bottom: 1px solid var(--border);
+    ul.jobs:empty { display: none; }
+    #results { margin-top: 8px; max-height: 50vh; overflow-y: auto; }
+    #recentSection { margin-bottom: 16px; }
+    ul.jobs li {
       display: flex;
-      justify-content: space-between;
-      gap: 8px;
+      align-items: stretch;
+      border-bottom: 1px solid var(--border);
     }
-    #results li:last-child { border-bottom: none; }
-    #results li:hover, #results li:focus { background: var(--hover); outline: none; }
-    #results li.selected { background: var(--selected); }
-    #results li.empty { color: var(--muted); cursor: default; font-style: italic; }
-    #results li.empty:hover { background: transparent; }
-    .tag { color: var(--muted); font-size: 12px; white-space: nowrap; }
-    #editor { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+    ul.jobs li:last-child { border-bottom: none; }
+    ul.jobs li.empty { padding: 7px 9px; color: var(--muted); font-style: italic; }
+    button.pick, button.edit {
+      font: inherit;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+    }
+    button.pick { flex: 1; padding: 7px 9px; min-width: 0; overflow-wrap: anywhere; }
+    button.edit { padding: 7px 10px; color: var(--accent); font-size: 13px; white-space: nowrap; }
+    button.pick:hover, button.pick:focus-visible, button.edit:hover, button.edit:focus-visible {
+      background: var(--hover);
+      outline: none;
+    }
     .hint { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
     .row { display: flex; align-items: center; gap: 6px; margin: 10px 0 0; font-weight: normal; }
     .row input { margin: 0; }
-    button {
+    button.primary {
       margin-top: 12px;
       width: 100%;
       padding: 8px 12px;
@@ -95,7 +107,7 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    button:disabled { opacity: 0.6; cursor: default; }
+    .links { margin-top: 10px; font-size: 13px; }
     a { color: var(--accent); }
     .status { margin-top: 10px; min-height: 1.2em; font-size: 13px; color: var(--muted); }
     .status.ok { color: var(--ok); }
@@ -104,16 +116,27 @@
   </style>
 </head>
 <body>
-  <label for="search">Find a job</label>
-  <input id="search" type="search" placeholder="Type a number or name" autocomplete="off" />
-  <ul id="results"></ul>
+  <div id="pickView">
+    <section id="recentSection" hidden>
+      <h2>Recent</h2>
+      <ul id="recent" class="jobs"></ul>
+    </section>
+
+    <label for="search">Find a job</label>
+    <input id="search" type="search" placeholder="Type a number or name, then Enter" autocomplete="off" />
+    <ul id="results" class="jobs"></ul>
+  </div>
 
   <div id="editor" hidden>
     <label for="jobText">Text to add to the subject</label>
     <input id="jobText" type="text" autocomplete="off" />
-    <p class="hint">Folder name: <span id="folderName"></span> <a href="#" id="resetLink" hidden>Use folder name</a></p>
+    <p class="hint">Folder name: <span id="editFolder"></span></p>
     <label class="row"><input id="remember" type="checkbox" /> Remember my version for this job</label>
-    <button id="addButton" type="button">Add to subject</button>
+    <button id="addButton" class="primary" type="button">Add to subject</button>
+    <div class="links">
+      <a href="#" id="cancelLink">Back</a>
+      <span id="resetLink" hidden> &middot; <a href="#">Use folder name</a></span>
+    </div>
   </div>
 
   <div id="status" class="status" role="status"></div>
